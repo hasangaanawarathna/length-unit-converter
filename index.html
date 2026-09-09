@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Precision Length Converter for fast, accurate engineering conversions.">
   <title>Precision Length Converter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -16,10 +13,11 @@
     <header class="topbar">
       <a class="brand" href="#top" aria-label="Precision Length Converter home">
         <span class="brand-mark" aria-hidden="true">↔</span>
-        <span><strong>Precision</strong><small>Length Converter</small></span>
+        <span><strong>Precision Length Converter</strong><small>Engineering Measurement Toolkit</small></span>
       </a>
       <div class="top-actions">
         <span class="status-pill"><span class="status-dot"></span>Live conversion</span>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="Open settings" title="Settings">⚙</button>
         <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
       </div>
     </header>
@@ -53,16 +51,25 @@
               <div class="field unit-field">
                 <label for="fromUnit">From unit</label>
                 <select id="fromUnit" aria-label="From unit"></select>
+                <span id="fromCategory" class="unit-category">Metric</span>
               </div>
               <button class="swap-button" id="swapButton" type="button" aria-label="Swap units" title="Swap units (S)">⇄</button>
               <div class="field unit-field">
                 <label for="toUnit">To unit</label>
                 <select id="toUnit" aria-label="To unit"></select>
+                <span id="toCategory" class="unit-category">Metric</span>
               </div>
             </div>
             <div class="form-actions">
               <button class="button button-primary" type="submit"><span>Convert</span><span aria-hidden="true">→</span></button>
               <button class="button button-quiet" id="resetButton" type="button">Reset</button>
+            </div>
+            <div class="precision-row">
+              <label for="precisionSelect">Display precision</label>
+              <select id="precisionSelect" aria-label="Display precision">
+                <option value="auto">Auto</option><option value="2">2 decimals</option><option value="4">4 decimals</option><option value="6">6 decimals</option><option value="8">8 decimals</option>
+              </select>
+              <span class="precision-note">Saved locally</span>
             </div>
           </form>
           <div class="quick-row" aria-label="Quick conversions">
@@ -79,9 +86,10 @@
         </div>
 
         <aside class="result-panel panel" aria-live="polite">
-          <div class="result-topline"><p class="eyebrow">LATEST RESULT</p><span id="resultTimestamp" class="timestamp">Ready when you are</span></div>
+          <div class="result-topline"><p class="eyebrow">CONVERTED RESULT</p><span id="resultTimestamp" class="timestamp">Ready when you are</span></div>
           <div id="resultDisplay" class="result-display">—</div>
           <p id="resultSentence" class="result-sentence">Enter a value to begin a precise conversion.</p>
+          <div class="accuracy-status"><span class="status-dot"></span>Accurate SI conversion</div>
           <div class="factor-box"><span>Conversion factor</span><strong id="factorDisplay">1 unit → 1 unit</strong></div>
           <div class="result-actions">
             <button class="button button-secondary" id="copyButton" type="button" disabled><span aria-hidden="true">▣</span> Copy result</button>
@@ -92,7 +100,7 @@
       </section>
 
       <section class="all-units-section" aria-labelledby="allUnitsTitle">
-        <div class="section-heading"><div><p class="eyebrow">FULL SCALE</p><h2 id="allUnitsTitle">Convert to all units</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
+        <div class="section-heading"><div><p class="eyebrow">FULL SCALE / EQUIVALENTS</p><h2 id="allUnitsTitle">Equivalent measurements</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
         <div id="allUnitsGrid" class="units-grid"></div>
       </section>
 
@@ -110,12 +118,12 @@
       <section class="reference-section panel" aria-labelledby="referenceTitle">
         <div class="reference-intro"><p class="eyebrow">FIELD NOTES / 02</p><h2 id="referenceTitle">Engineering reference</h2><p>A compact set of constants for quick mental checks and on-site work.</p></div>
         <div class="reference-list">
-          <div><strong>1 inch</strong><span>25.4 mm</span></div><div><strong>1 foot</strong><span>304.8 mm</span></div><div><strong>1 foot</strong><span>12 inches</span></div><div><strong>1 yard</strong><span>3 feet</span></div><div><strong>1 meter</strong><span>1000 mm</span></div><div><strong>1 kilometer</strong><span>1000 meters</span></div><div><strong>1 mile</strong><span>1609.344 meters</span></div>
+          <div><strong>1 in</strong><span>25.4 mm <small>Exact</small></span></div><div><strong>1 ft</strong><span>304.8 mm <small>International standard</small></span></div><div><strong>1 yd</strong><span>0.9144 m <small>Exact</small></span></div><div><strong>1 mi</strong><span>1609.344 m <small>International standard</small></span></div><div><strong>1 m</strong><span>1000 mm <small>Metric relationship</small></span></div><div><strong>1 km</strong><span>1000 m <small>Metric relationship</small></span></div>
         </div>
       </section>
     </main>
 
-    <footer><span>Precision Length Converter</span><span>Built with HTML, CSS &amp; JavaScript</span></footer>
+    <footer><span><strong>Precision Length Converter</strong><small>Engineering Measurement Toolkit</small></span><span>SI and international conversion standards<br>Built with HTML, CSS &amp; JavaScript</span></footer>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
