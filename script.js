@@ -67,7 +67,19 @@ function updateFavoriteState() {
 
 function performConversion(save = true) {
   const parsed = parseValue();
-  if (parsed.error) { setError(parsed.error); return false; }
+  if (parsed.error) {
+    setError(parsed.error);
+    latestConversion = null;
+    elements.result.textContent = '—';
+    elements.sentence.textContent = 'Enter a valid value to see a result.';
+    elements.factor.textContent = '1 unit → 1 unit';
+    elements.timestamp.textContent = 'Waiting for valid input';
+    elements.allSummary.textContent = 'Waiting for valid input';
+    elements.allUnits.innerHTML = '';
+    elements.copy.disabled = true;
+    updateFavoriteState();
+    return false;
+  }
   setError('');
   const fromKey = elements.from.value;
   const toKey = elements.to.value;
