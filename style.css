@@ -55,6 +55,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 /* Premium engineering dashboard layer */
 :root { --ink: #12213a; --muted: #64748b; --paper: #eef3f8; --card: rgba(255,255,255,.82); --line: #d7e1ec; --accent: #1677e8; --accent-strong: #0c56b4; --accent-soft: #e0efff; --sun: #f2b84b; --shadow: 0 24px 70px rgba(31,61,97,.12); --radius: 20px; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 [data-theme="dark"] { --ink: #eff6ff; --muted: #9aacbf; --paper: #0b1221; --card: rgba(20,31,52,.84); --line: #263b59; --accent: #53c7ff; --accent-strong: #8fdcff; --accent-soft: #153a57; --sun: #f3c469; --shadow: 0 24px 80px rgba(0,0,0,.33); }
+html, body { overflow-x: hidden; }
 body { background: var(--paper); font-family: inherit; }
 body::before { opacity: .22; background-image: linear-gradient(rgba(79,141,202,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(79,141,202,.08) 1px, transparent 1px), radial-gradient(var(--accent) .6px, transparent .6px); background-size: 48px 48px, 48px 48px, 18px 18px; }
 .page-shell::before { content: ''; position: absolute; width: 520px; height: 260px; right: -160px; top: 0; pointer-events: none; background: radial-gradient(ellipse, rgba(83,199,255,.18), transparent 68%); filter: blur(10px); animation: drift 8s ease-in-out infinite alternate; }
