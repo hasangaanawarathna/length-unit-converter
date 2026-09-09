@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Precision Length Converter for fast, accurate engineering conversions.">
+  <title>Precision Length Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Precision Length Converter home">
+        <span class="brand-mark" aria-hidden="true">↔</span>
+        <span><strong>Precision</strong><small>Length Converter</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="status-pill"><span class="status-dot"></span>Live conversion</span>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="pageTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">ENGINEERING TOOL / 01</p>
+          <h1 id="pageTitle">Measure with<br><em>confidence.</em></h1>
+          <p class="hero-intro">Fast, exact length conversions for the details that matter. Built for the workbench, the field, and everywhere in between.</p>
+        </div>
+        <div class="hero-metric" aria-label="Supported units">
+          <span class="metric-number">11</span>
+          <span class="metric-label">supported units<br>one reliable result</span>
+        </div>
+      </section>
+
+      <section class="workspace-grid" aria-label="Length converter workspace">
+        <div class="converter-panel panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">CONVERSION INPUT</p><h2>Calculate a length</h2></div>
+            <span class="shortcut-hint"><kbd>Enter</kbd> to convert</span>
+          </div>
+          <form id="converterForm" novalidate>
+            <div class="input-row">
+              <div class="field value-field">
+                <label for="valueInput">Value</label>
+                <input id="valueInput" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-describedby="inputError">
+                <p id="inputError" class="field-error" role="alert"></p>
+              </div>
+              <div class="field unit-field">
+                <label for="fromUnit">From unit</label>
+                <select id="fromUnit" aria-label="From unit"></select>
+              </div>
+              <button class="swap-button" id="swapButton" type="button" aria-label="Swap units" title="Swap units (S)">⇄</button>
+              <div class="field unit-field">
+                <label for="toUnit">To unit</label>
+                <select id="toUnit" aria-label="To unit"></select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="button button-primary" type="submit"><span>Convert</span><span aria-hidden="true">→</span></button>
+              <button class="button button-quiet" id="resetButton" type="button">Reset</button>
+            </div>
+          </form>
+          <div class="quick-row" aria-label="Quick conversions">
+            <span class="quick-label">Quick start</span>
+            <button type="button" class="quick-chip" data-value="1" data-unit="mm">1 mm</button>
+            <button type="button" class="quick-chip" data-value="10" data-unit="mm">10 mm</button>
+            <button type="button" class="quick-chip" data-value="100" data-unit="mm">100 mm</button>
+            <button type="button" class="quick-chip" data-value="1" data-unit="m">1 m</button>
+            <button type="button" class="quick-chip" data-value="10" data-unit="m">10 m</button>
+            <button type="button" class="quick-chip" data-value="1" data-unit="km">1 km</button>
+            <button type="button" class="quick-chip" data-value="1" data-unit="in">1 inch</button>
+            <button type="button" class="quick-chip" data-value="1" data-unit="ft">1 foot</button>
+          </div>
+        </div>
+
+        <aside class="result-panel panel" aria-live="polite">
+          <div class="result-topline"><p class="eyebrow">LATEST RESULT</p><span id="resultTimestamp" class="timestamp">Ready when you are</span></div>
+          <div id="resultDisplay" class="result-display">—</div>
+          <p id="resultSentence" class="result-sentence">Enter a value to begin a precise conversion.</p>
+          <div class="factor-box"><span>Conversion factor</span><strong id="factorDisplay">1 unit → 1 unit</strong></div>
+          <div class="result-actions">
+            <button class="button button-secondary" id="copyButton" type="button" disabled><span aria-hidden="true">▣</span> Copy result</button>
+            <button class="favorite-button" id="favoriteButton" type="button" aria-label="Save current unit pair as favorite" title="Save unit pair">☆</button>
+          </div>
+          <p id="copyStatus" class="copy-status" role="status"></p>
+        </aside>
+      </section>
+
+      <section class="all-units-section" aria-labelledby="allUnitsTitle">
+        <div class="section-heading"><div><p class="eyebrow">FULL SCALE</p><h2 id="allUnitsTitle">Convert to all units</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
+        <div id="allUnitsGrid" class="units-grid"></div>
+      </section>
+
+      <section class="lower-grid">
+        <div class="panel history-panel">
+          <div class="section-heading"><div><p class="eyebrow">RECENT WORK</p><h2>Conversion history</h2></div><button id="clearHistoryButton" class="text-button" type="button">Clear history</button></div>
+          <div id="historyList" class="history-list"><div class="empty-state">Your ten most recent conversions will appear here.</div></div>
+        </div>
+        <div class="panel favorites-panel">
+          <div class="section-heading"><div><p class="eyebrow">SAVED PAIRS</p><h2>Favorites</h2></div><span class="section-note">Click to use</span></div>
+          <div id="favoritesList" class="favorites-list"><div class="empty-state">Save a unit pair with the ☆ button.</div></div>
+        </div>
+      </section>
+
+      <section class="reference-section panel" aria-labelledby="referenceTitle">
+        <div class="reference-intro"><p class="eyebrow">FIELD NOTES / 02</p><h2 id="referenceTitle">Engineering reference</h2><p>A compact set of constants for quick mental checks and on-site work.</p></div>
+        <div class="reference-list">
+          <div><strong>1 inch</strong><span>25.4 mm</span></div><div><strong>1 foot</strong><span>304.8 mm</span></div><div><strong>1 foot</strong><span>12 inches</span></div><div><strong>1 yard</strong><span>3 feet</span></div><div><strong>1 meter</strong><span>1000 mm</span></div><div><strong>1 kilometer</strong><span>1000 meters</span></div><div><strong>1 mile</strong><span>1609.344 meters</span></div>
+        </div>
+      </section>
+    </main>
+
+    <footer><span>Precision Length Converter</span><span>Built with HTML, CSS &amp; JavaScript</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
