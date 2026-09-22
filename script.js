@@ -162,7 +162,7 @@ async function copyText(text) { try { await navigator.clipboard.writeText(text);
 
 function applyTheme(theme) { document.documentElement.dataset.theme = theme; elements.themeToggle.textContent = theme === 'dark' ? '☀' : '☾'; elements.themeToggle.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`); }
 
-populateUnits(); renderHistory(); renderFavorites(); applyTheme(getPreference(storageKeys.theme) === 'dark' ? 'dark' : 'light'); elements.precision.value = ['auto','2','4','6','8'].includes(getPreference(storageKeys.precision)) ? getPreference(storageKeys.precision) : 'auto'; updateFavoriteState();
+populateUnits(); renderHistory(); renderFavorites(); applyTheme(getPreference(storageKeys.theme) === 'light' ? 'light' : 'dark'); elements.precision.value = ['auto','2','4','6','8'].includes(getPreference(storageKeys.precision)) ? getPreference(storageKeys.precision) : 'auto'; updateFavoriteState();
 elements.form.addEventListener('submit', event => { event.preventDefault(); performConversion(); });
 elements.value.addEventListener('input', () => { if (elements.value.value.trim()) performConversion(false); else reset(); });
 elements.from.addEventListener('change', () => { if (elements.value.value.trim()) performConversion(false); else updateFavoriteState(); });
