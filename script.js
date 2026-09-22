@@ -24,22 +24,29 @@ function populateUnits() {
 function formatNumber(number) {
   if (!Number.isFinite(number)) return '—';
   const precision = elements.precision?.value || 'auto';
+  if (precision !== 'auto' && number !== 0 && Math.abs(number) < Math.pow(10, -Number(precision))) return number.toExponential(Number(precision));
   if (precision !== 'auto') return Number(number).toFixed(Number(precision)).replace(/\.0+$|(?<=\.[0-9]*?)0+$/, '').replace(/\.$/, '');
   const absolute = Math.abs(number);
   if (absolute !== 0 && (absolute >= 1e9 || absolute < 1e-6)) return number.toExponential(8).replace(/\.?(?:0+)(e|$)/, '$1').replace('e+', 'e');
   return new Intl.NumberFormat('en-US', { maximumSignificantDigits: 12, useGrouping: false }).format(number);
 }
 
-function parseValue() {
-  const raw = elements.value.value.trim().replace(/,/g, '');
+function parseNumber(raw) {
+  raw = raw.trim();
   if (!raw) return { value: null, error: 'Enter a value to convert.' };
-  const value = Number(raw);
-  if (!Number.isFinite(value)) return { value: null, error: 'Use a valid number, such as 12.5 or 3e-4.' };
-  return { value, error: '' };
+  const fraction = raw.match(/^([+-]?)(?:(\d+)\s+)?(\d+)\/(\d+)$/);
+  let value;
+  if (fraction) value = (fraction[1] === '-' ? -1 : 1) * (Number(fraction[2] || 0) + Number(fraction[3]) / Number(fraction[4]));
+  else {
+    if (!/^[+-]?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw)) return { value: null, error: 'Use a number, fraction, or scientific notation.' };
+    value = Number(raw.replace(/,/g, ''));
+  }
+  return Number.isFinite(value) ? { value, error: '' } : { value: null, error: 'Value must be finite; a denominator cannot be zero.' };
 }
+function parseValue() { return parseNumber(elements.value.value); }
 
 function convert(value, fromKey, toKey) {
-  return (value * units[fromKey].factor) / units[toKey].factor;
+  return value * (units[fromKey].factor / units[toKey].factor);
 }
 
 function getDateLabel(date = new Date()) { return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
@@ -52,6 +59,8 @@ function renderAllUnits(meters, activeKey) {
 }
 
 function updateFavoriteState() {
+  elements.fromCategory.textContent = units[elements.from.value].category;
+  elements.toCategory.textContent = units[elements.to.value].category;
   const favorites = readStorage(storageKeys.favorites, []);
   const saved = favorites.some(item => item.from === elements.from.value && item.to === elements.to.value);
   elements.favorite.classList.toggle('is-saved', saved);
@@ -82,7 +91,7 @@ function performConversion(save = true) {
   elements.toCategory.textContent = units[toKey].category;
   const result = convert(parsed.value, fromKey, toKey);
   const meters = parsed.value * units[fromKey].factor;
-  if (!Number.isFinite(result) || !Number.isFinite(meters)) { setError('That value is outside the safe conversion range.'); return false; }
+  if (!Number.isFinite(result) || !Number.isFinite(meters)) { latestConversion = null; elements.copy.disabled = true; elements.result.textContent = '—'; elements.sentence.textContent = 'Value exceeds the conversion range.'; elements.allUnits.innerHTML = ''; elements.allSummary.textContent = 'Outside conversion range'; elements.copyStatus.textContent = ''; setError('That value is outside the safe conversion range.'); return false; }
   const formattedInput = formatNumber(parsed.value);
   const formattedResult = formatNumber(result);
   latestConversion = { value: parsed.value, from: fromKey, to: toKey, result, meters, time: new Date().toISOString() };
@@ -100,8 +109,17 @@ function performConversion(save = true) {
   return true;
 }
 
-function readStorage(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } }
-function writeStorage(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+const memoryStorage = new Map();
+function getPreference(key) { try { return localStorage.getItem(key); } catch { return memoryStorage.get(key) || null; } }
+function setPreference(key, value) { memoryStorage.set(key, value); try { localStorage.setItem(key, value); } catch { showToast('Storage unavailable. Settings kept for this session.'); } }
+function readStorage(key, fallback) {
+  try {
+    const value = JSON.parse(getPreference(key));
+    if (!Array.isArray(value)) return fallback;
+    return value.filter(item => item && Object.hasOwn(units, item.from) && Object.hasOwn(units, item.to) && (key !== storageKeys.history || (Number.isFinite(item.value) && Number.isFinite(item.result) && typeof item.time === 'string' && Number.isFinite(Date.parse(item.time)))));
+  } catch { return fallback; }
+}
+function writeStorage(key, value) { setPreference(key, JSON.stringify(value)); }
 
 function saveHistory(conversion) {
   const history = readStorage(storageKeys.history, []);
@@ -131,20 +149,20 @@ function renderFavorites() {
 }
 
 function toggleFavorite() {
-  if (!latestConversion) return showToast('Convert a value before saving a pair.');
+  const pair = { from: elements.from.value, to: elements.to.value };
   const favorites = readStorage(storageKeys.favorites, []);
-  const existing = favorites.findIndex(item => item.from === latestConversion.from && item.to === latestConversion.to);
-  if (existing >= 0) { favorites.splice(existing, 1); elements.favorite.classList.add('favorite-bounce'); showToast('Favorite removed.'); } else { favorites.unshift({ from: latestConversion.from, to: latestConversion.to }); elements.favorite.classList.add('favorite-bounce'); showToast('Favorite pair saved.'); }
+  const existing = favorites.findIndex(item => item.from === pair.from && item.to === pair.to);
+  if (existing >= 0) { favorites.splice(existing, 1); elements.favorite.classList.add('favorite-bounce'); showToast('Favorite removed.'); } else { favorites.unshift(pair); elements.favorite.classList.add('favorite-bounce'); showToast('Favorite pair saved.'); }
   writeStorage(storageKeys.favorites, favorites.slice(0, 12)); renderFavorites(); updateFavoriteState();
 }
 
 function reset() { elements.value.value = ''; setError(''); latestConversion = null; elements.result.textContent = '—'; elements.sentence.textContent = 'Enter a value to begin a precise conversion.'; elements.factor.textContent = '1 unit → 1 unit'; elements.timestamp.textContent = 'Ready when you are'; elements.allSummary.textContent = 'Waiting for input'; elements.allUnits.innerHTML = ''; elements.copy.disabled = true; elements.copyStatus.textContent = ''; updateFavoriteState(); elements.value.focus(); }
 function showToast(message) { clearTimeout(toastTimer); elements.toast.textContent = message; elements.toast.classList.add('show'); toastTimer = setTimeout(() => elements.toast.classList.remove('show'), 2300); }
-async function copyText(text) { try { await navigator.clipboard.writeText(text); showToast('Result copied.'); } catch { showToast('Copy unavailable.'); } }
+async function copyText(text) { try { await navigator.clipboard.writeText(text); showToast('Result copied.'); return true; } catch { showToast('Copy unavailable. Select and copy the result manually.'); return false; } }
 
 function applyTheme(theme) { document.documentElement.dataset.theme = theme; elements.themeToggle.textContent = theme === 'dark' ? '☀' : '☾'; elements.themeToggle.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`); }
 
-populateUnits(); renderHistory(); renderFavorites(); applyTheme(localStorage.getItem(storageKeys.theme) || 'light'); elements.precision.value = localStorage.getItem(storageKeys.precision) || 'auto'; updateFavoriteState();
+populateUnits(); renderHistory(); renderFavorites(); applyTheme(getPreference(storageKeys.theme) === 'dark' ? 'dark' : 'light'); elements.precision.value = ['auto','2','4','6','8'].includes(getPreference(storageKeys.precision)) ? getPreference(storageKeys.precision) : 'auto'; updateFavoriteState();
 elements.form.addEventListener('submit', event => { event.preventDefault(); performConversion(); });
 elements.value.addEventListener('input', () => { if (elements.value.value.trim()) performConversion(false); else reset(); });
 elements.from.addEventListener('change', () => { if (elements.value.value.trim()) performConversion(false); else updateFavoriteState(); });
@@ -153,9 +171,49 @@ document.querySelector('#swapButton').addEventListener('click', () => { const pr
 document.querySelector('#resetButton').addEventListener('click', reset);
 document.querySelector('#clearHistoryButton').addEventListener('click', () => { writeStorage(storageKeys.history, []); renderHistory(); showToast('Conversion history cleared.'); });
 elements.favorite.addEventListener('click', toggleFavorite);
-elements.copy.addEventListener('click', async () => { if (!latestConversion) return; await copyText(elements.sentence.textContent); elements.copyStatus.textContent = 'Copied to clipboard'; });
-elements.precision.addEventListener('change', () => { localStorage.setItem(storageKeys.precision, elements.precision.value); if (elements.value.value.trim()) performConversion(false); });
-document.querySelector('#settingsButton').addEventListener('click', () => showToast('Precision settings are ready above.'));
-elements.themeToggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; applyTheme(next); localStorage.setItem(storageKeys.theme, next); });
+elements.copy.addEventListener('click', async () => { if (!latestConversion) return; const copied = await copyText(elements.sentence.textContent); elements.copyStatus.textContent = copied ? 'Copied to clipboard' : 'Select the result to copy manually.'; });
+elements.precision.addEventListener('change', () => { setPreference(storageKeys.precision, elements.precision.value); if (elements.value.value.trim()) performConversion(false); });
+document.querySelector('#settingsButton').addEventListener('click', () => { document.querySelector('#settingsPrecision').value = elements.precision.value; document.querySelector('#settingsDialog').showModal(); });
+elements.themeToggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; applyTheme(next); setPreference(storageKeys.theme, next); });
 document.querySelectorAll('.quick-chip').forEach(button => button.addEventListener('click', () => { elements.value.value = button.dataset.value; elements.from.value = button.dataset.unit; if (button.dataset.unit === 'in') elements.to.value = 'mm'; else if (button.dataset.unit === 'ft') elements.to.value = 'm'; else if (button.dataset.unit === 'mm') elements.to.value = 'm'; else elements.to.value = 'mm'; performConversion(); }));
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.activeElement === elements.value) { elements.value.value = ''; reset(); } if (document.activeElement === elements.value || ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return; if (event.key.toLowerCase() === 'r') reset(); if (event.key.toLowerCase() === 's') document.querySelector('#swapButton').click(); });
+
+const searchInput = document.querySelector('#unitSearch');
+function filterUnits() { const query = searchInput.value.trim().toLowerCase(); elements.allUnits.querySelectorAll('.unit-card').forEach(card => { card.hidden = !card.textContent.toLowerCase().includes(query); }); }
+searchInput.addEventListener('input', filterUnits);
+new MutationObserver(filterUnits).observe(elements.allUnits, { childList: true });
+document.querySelector('#settingsPrecision').addEventListener('change', event => { elements.precision.value = event.target.value; elements.precision.dispatchEvent(new Event('change')); renderHistory(); });
+function downloadCsv(rows, filename) {
+  const csv = rows.map(row => row.map(value => '"' + String(value).replaceAll('"', '""') + '"').join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a'); link.href = url; link.download = filename; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+document.querySelector('#exportUnits').addEventListener('click', () => {
+  if (!latestConversion) return showToast('Convert a value first.');
+  downloadCsv([['Unit','Symbol','Value'], ...Object.entries(units).map(([key, unit]) => [unit.name, unit.symbol, convert(latestConversion.value, latestConversion.from, key)])], 'equivalent-measurements.csv');
+});
+let batchRows = [];
+function invalidateBatch() { batchRows = []; document.querySelector('#batchExport').disabled = true; document.querySelector('#batchResults').replaceChildren(); document.querySelector('#batchStatus').textContent = ''; }
+document.querySelector('#batchInput').addEventListener('input', invalidateBatch);
+elements.from.addEventListener('change', invalidateBatch); elements.to.addEventListener('change', invalidateBatch);
+document.querySelector('#batchConvert').addEventListener('click', () => {
+  invalidateBatch();
+  const lines = document.querySelector('#batchInput').value.trim().split(/\r?\n/);
+  if (lines.length > 500 || !lines[0]) return showToast('Enter between 1 and 500 values.');
+  const from = elements.from.value, to = elements.to.value;
+  batchRows = [['Input (' + units[from].symbol + ')', 'Result (' + units[to].symbol + ')']];
+  const table = document.createElement('table');
+  const heading = table.createTHead().insertRow(); batchRows[0].forEach(label => { const th = document.createElement('th'); th.scope = 'col'; th.textContent = label; heading.append(th); });
+  const body = table.createTBody(); let errors = 0;
+  lines.forEach(line => {
+    const parsed = parseNumber(line), result = parsed.error ? NaN : convert(parsed.value, from, to);
+    const error = parsed.error || (!Number.isFinite(result) ? 'Outside conversion range' : '');
+    if (error) errors++;
+    const row = [error ? 'Invalid input' : parsed.value, error || result]; batchRows.push(row);
+    const tr = body.insertRow(); [line, error || formatNumber(result)].forEach(value => { tr.insertCell().textContent = value; });
+    if (error) tr.className = 'batch-error';
+  });
+  document.querySelector('#batchResults').append(table); document.querySelector('#batchExport').disabled = false;
+  document.querySelector('#batchStatus').textContent = (lines.length - errors) + ' converted · ' + errors + ' errors';
+});
+document.querySelector('#batchExport').addEventListener('click', () => { if (batchRows.length) downloadCsv(batchRows, 'batch-conversions.csv'); });
