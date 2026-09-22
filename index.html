@@ -101,10 +101,10 @@
 
       <section class="all-units-section" aria-labelledby="allUnitsTitle">
         <div class="section-heading"><div><p class="eyebrow">FULL SCALE / EQUIVALENTS</p><h2 id="allUnitsTitle">Equivalent measurements</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
-        <div id="allUnitsGrid" class="units-grid"></div>
+        <div class="toolbar"><label for="unitSearch">Find a unit</label><input id="unitSearch" type="search" placeholder="Search name, symbol or category"><button id="exportUnits" class="button button-quiet" type="button">Export equivalents CSV</button></div><div id="allUnitsGrid" class="units-grid"></div>
       </section>
 
-      <section class="lower-grid">
+      <section class="panel batch-panel" aria-labelledby="batchTitle"><div class="section-heading"><div><p class="eyebrow">MULTIPLE VALUES / ONE STEP</p><h2 id="batchTitle">Batch conversion</h2></div><span class="section-note">Uses your selected units</span></div><label for="batchInput">Enter one value per line (up to 500)</label><textarea id="batchInput" rows="5" placeholder="12.5&#10;1/2&#10;3e4"></textarea><div class="toolbar"><button id="batchConvert" type="button" class="button button-primary">Convert batch</button><button id="batchExport" type="button" class="button button-quiet" disabled>Download CSV</button><span id="batchStatus" role="status"></span></div><div id="batchResults" class="table-scroll"></div></section><section class="lower-grid">
         <div class="panel history-panel">
           <div class="section-heading"><div><p class="eyebrow">RECENT WORK</p><h2>Conversion history</h2></div><button id="clearHistoryButton" class="text-button" type="button">Clear history</button></div>
           <div id="historyList" class="history-list"><div class="empty-state">Your ten most recent conversions will appear here.</div></div>
@@ -125,6 +125,6 @@
 
     <footer><span><strong>Precision Length Converter</strong><small>Engineering Measurement Toolkit</small></span><span>SI and international conversion standards<br>Built with HTML, CSS &amp; JavaScript</span></footer>
   </div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="settingsDialog"><form method="dialog"><div class="section-heading"><h2>Workspace settings</h2><button class="icon-button" aria-label="Close settings">×</button></div><p>Display precision is saved on this device. Small nonzero results use scientific notation when needed.</p><label for="settingsPrecision">Decimal places</label><select id="settingsPrecision"><option value="auto">Auto</option><option value="2">2 decimals</option><option value="4">4 decimals</option><option value="6">6 decimals</option><option value="8">8 decimals</option></select><p>Keyboard shortcuts: <kbd>S</kbd> swap units · <kbd>R</kbd> reset · <kbd>Enter</kbd> convert</p><p>Input supports decimals, scientific notation, fractions (1/2), and mixed numbers (2 1/2).</p><button class="button button-primary">Done</button></form></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
