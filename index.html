@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,9 +13,9 @@
     <header class="topbar">
       <a class="brand" href="#top" aria-label="Precision Length Converter home">
         <span class="brand-mark" aria-hidden="true">↔</span>
-        <span><strong>Precision Length Converter</strong><small>Engineering Measurement Toolkit</small></span>
+        <span><strong>Measure<span class="brand-plus">/</span></strong><small>PRECISION LENGTH TOOLKIT</small></span>
       </a>
-      <div class="top-actions">
+      <nav class="workspace-nav" aria-label="Workspace"><a class="nav-active" href="#converterForm">Converter</a><a href="#batchTitle">Batch tools</a><a href="#referenceTitle">Reference</a></nav><div class="top-actions">
         <span class="status-pill"><span class="status-dot"></span>Live conversion</span>
         <button class="icon-button" id="settingsButton" type="button" aria-label="Open settings" title="Settings">⚙</button>
         <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
@@ -25,20 +25,20 @@
     <main id="top">
       <section class="hero" aria-labelledby="pageTitle">
         <div class="hero-copy">
-          <p class="eyebrow">ENGINEERING TOOL / 01</p>
-          <h1 id="pageTitle">Measure with<br><em>confidence.</em></h1>
-          <p class="hero-intro">Fast, exact length conversions for the details that matter. Built for the workbench, the field, and everywhere in between.</p>
+          <p class="eyebrow">YOUR EVERYDAY MEASUREMENT WORKSPACE</p>
+          <h1 id="pageTitle">Small details.<br><em>Exact measurements.</em></h1>
+          <p class="hero-intro">From nanometers to nautical miles. Convert, compare, and keep your work moving—all in one place.</p>
         </div>
         <div class="hero-metric" aria-label="Supported units">
-          <span class="metric-number">11</span>
-          <span class="metric-label">supported units<br>one reliable result</span>
+          <div class="ruler-art" aria-hidden="true"><span>0</span><span>5</span><span>10</span><i></i></div><span class="metric-number">11</span>
+          <span class="metric-label">units. Endless possibilities.</span>
         </div>
       </section>
 
       <section class="workspace-grid" aria-label="Length converter workspace">
         <div class="converter-panel panel">
           <div class="panel-heading">
-            <div><p class="eyebrow">CONVERSION INPUT</p><h2>Calculate a length</h2></div>
+            <div><p class="eyebrow">01 / CONVERTER</p><h2>Let’s do the math.</h2></div>
             <span class="shortcut-hint"><kbd>Enter</kbd> to convert</span>
           </div>
           <form id="converterForm" novalidate>
@@ -86,7 +86,7 @@
         </div>
 
         <aside class="result-panel panel" aria-live="polite">
-          <div class="result-topline"><p class="eyebrow">CONVERTED RESULT</p><span id="resultTimestamp" class="timestamp">Ready when you are</span></div>
+          <div class="result-topline"><p class="eyebrow">YOUR RESULT</p><span id="resultTimestamp" class="timestamp">Ready when you are</span></div>
           <div id="resultDisplay" class="result-display">—</div>
           <p id="resultSentence" class="result-sentence">Enter a value to begin a precise conversion.</p>
           <div class="accuracy-status"><span class="status-dot"></span>Accurate SI conversion</div>
@@ -100,7 +100,7 @@
       </section>
 
       <section class="all-units-section" aria-labelledby="allUnitsTitle">
-        <div class="section-heading"><div><p class="eyebrow">FULL SCALE / EQUIVALENTS</p><h2 id="allUnitsTitle">Equivalent measurements</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
+        <div class="section-heading"><div><p class="eyebrow">02 / EXPLORE THE SCALE</p><h2 id="allUnitsTitle">Equivalent measurements</h2></div><span id="allUnitsSummary" class="section-note">Waiting for input</span></div>
         <div class="toolbar"><label for="unitSearch">Find a unit</label><input id="unitSearch" type="search" placeholder="Search name, symbol or category"><button id="exportUnits" class="button button-quiet" type="button">Export equivalents CSV</button></div><div id="allUnitsGrid" class="units-grid"></div>
       </section>
 
