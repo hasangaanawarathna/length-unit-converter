@@ -19,6 +19,17 @@
         <span class="status-pill"><span class="status-dot"></span>Live conversion</span>
         <button class="icon-button" id="settingsButton" type="button" aria-label="Open settings" title="Settings">⚙</button>
         <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
+        <div class="account-menu-wrap">
+          <button class="account-button" id="accountButton" type="button" aria-expanded="false" aria-controls="accountMenu" aria-label="Open account menu">
+            <span class="account-avatar" aria-hidden="true">SA</span><span class="account-name">Sanda</span><span class="account-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="account-menu" id="accountMenu" hidden>
+            <div class="account-summary"><span class="account-avatar account-avatar-large" aria-hidden="true">SA</span><span><strong>Sanda</strong><small>Personal workspace</small></span></div>
+            <div class="account-menu-divider"></div>
+            <button type="button" class="account-menu-item" id="accountSettingsButton"><span aria-hidden="true">⚙</span> Account settings</button>
+            <button type="button" class="account-menu-item account-menu-danger" id="signOutButton"><span aria-hidden="true">↪</span> Sign out</button>
+          </div>
+        </div>
       </div>
     </header>
 
