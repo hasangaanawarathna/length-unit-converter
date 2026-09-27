@@ -3,7 +3,7 @@ const units = {
   in: { name: 'Inch', symbol: 'in', factor: 0.0254, category: 'Imperial / US' }, ft: { name: 'Foot', symbol: 'ft', factor: 0.3048, category: 'Imperial / US' }, yd: { name: 'Yard', symbol: 'yd', factor: 0.9144, category: 'Imperial / US' }, mi: { name: 'Mile', symbol: 'mi', factor: 1609.344, category: 'Imperial / US' }, nmi: { name: 'Nautical mile', symbol: 'nmi', factor: 1852, category: 'Marine' }
 };
 
-const storageKeys = { history: 'precision-length-history', favorites: 'precision-length-favorites', theme: 'precision-length-theme', precision: 'precision-length-precision' };
+const storageKeys = { history: 'precision-length-history', favorites: 'precision-length-favorites', theme: 'precision-length-theme', precision: 'precision-length-precision', account: 'precision-length-account' };
 const elements = {
   form: document.querySelector('#converterForm'), value: document.querySelector('#valueInput'), from: document.querySelector('#fromUnit'), to: document.querySelector('#toUnit'), inputError: document.querySelector('#inputError'),
   result: document.querySelector('#resultDisplay'), sentence: document.querySelector('#resultSentence'), factor: document.querySelector('#factorDisplay'), timestamp: document.querySelector('#resultTimestamp'), copy: document.querySelector('#copyButton'), copyStatus: document.querySelector('#copyStatus'), favorite: document.querySelector('#favoriteButton'), allUnits: document.querySelector('#allUnitsGrid'), allSummary: document.querySelector('#allUnitsSummary'), history: document.querySelector('#historyList'), favorites: document.querySelector('#favoritesList'), toast: document.querySelector('#toast'), themeToggle: document.querySelector('#themeToggle'), precision: document.querySelector('#precisionSelect'), fromCategory: document.querySelector('#fromCategory'), toCategory: document.querySelector('#toCategory')
@@ -187,7 +187,15 @@ const accountMenu = document.querySelector('#accountMenu');
 function setAccountMenu(open) { accountMenu.hidden = !open; accountButton.setAttribute('aria-expanded', String(open)); }
 accountButton.addEventListener('click', () => setAccountMenu(accountMenu.hidden));
 document.addEventListener('click', event => { if (!event.target.closest('.account-menu-wrap')) setAccountMenu(false); });
-document.querySelector('#accountSettingsButton').addEventListener('click', () => { setAccountMenu(false); document.querySelector('#settingsButton').click(); });
+const accountSettingsDialog = document.querySelector('#accountSettingsDialog');
+const accountSettingsForm = document.querySelector('#accountSettingsForm');
+const accountName = document.querySelector('#accountName');
+const accountEmail = document.querySelector('#accountEmail');
+const accountTimezone = document.querySelector('#accountTimezone');
+const savedAccount = (() => { try { return JSON.parse(getPreference(storageKeys.account)) || {}; } catch { return {}; } })();
+accountName.value = savedAccount.name || 'Sanda'; accountEmail.value = savedAccount.email || 'sanda@example.com'; accountTimezone.value = savedAccount.timezone || 'Local time';
+document.querySelector('#accountSettingsButton').addEventListener('click', () => { setAccountMenu(false); accountSettingsDialog.showModal(); });
+document.querySelector('#saveAccountButton').addEventListener('click', () => { if (!accountSettingsForm.reportValidity()) return; const account = { name: accountName.value.trim(), email: accountEmail.value.trim(), timezone: accountTimezone.value }; setPreference(storageKeys.account, JSON.stringify(account)); document.querySelector('.account-name').textContent = account.name; document.querySelector('.account-summary strong').textContent = account.name; accountSettingsDialog.close(); showToast('Account details saved.'); });
 document.querySelector('#signOutButton').addEventListener('click', () => { setAccountMenu(false); showToast('You are already signed out of this local workspace.'); });
 document.querySelector('#settingsPrecision').addEventListener('change', event => { elements.precision.value = event.target.value; elements.precision.dispatchEvent(new Event('change')); renderHistory(); });
 function downloadCsv(rows, filename) {
