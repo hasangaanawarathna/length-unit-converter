@@ -182,6 +182,13 @@ const searchInput = document.querySelector('#unitSearch');
 function filterUnits() { const query = searchInput.value.trim().toLowerCase(); elements.allUnits.querySelectorAll('.unit-card').forEach(card => { card.hidden = !card.textContent.toLowerCase().includes(query); }); }
 searchInput.addEventListener('input', filterUnits);
 new MutationObserver(filterUnits).observe(elements.allUnits, { childList: true });
+const accountButton = document.querySelector('#accountButton');
+const accountMenu = document.querySelector('#accountMenu');
+function setAccountMenu(open) { accountMenu.hidden = !open; accountButton.setAttribute('aria-expanded', String(open)); }
+accountButton.addEventListener('click', () => setAccountMenu(accountMenu.hidden));
+document.addEventListener('click', event => { if (!event.target.closest('.account-menu-wrap')) setAccountMenu(false); });
+document.querySelector('#accountSettingsButton').addEventListener('click', () => { setAccountMenu(false); document.querySelector('#settingsButton').click(); });
+document.querySelector('#signOutButton').addEventListener('click', () => { setAccountMenu(false); showToast('You are already signed out of this local workspace.'); });
 document.querySelector('#settingsPrecision').addEventListener('change', event => { elements.precision.value = event.target.value; elements.precision.dispatchEvent(new Event('change')); renderHistory(); });
 function downloadCsv(rows, filename) {
   const csv = rows.map(row => row.map(value => '"' + String(value).replaceAll('"', '""') + '"').join(',')).join('\r\n');
